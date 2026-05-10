@@ -274,7 +274,7 @@
       <div class="card-stack">
         <section class="intro-card">
           <h2>Welcome</h2>
-          <p>Maintain high standards through objective peer evaluations on four benchmarks: Deliverables, Commitment, Cooperation, and Initiative.</p>
+          <p>Maintain high standards through objective peer evaluations on two benchmarks: Deliverables and Teamwork.</p>
           <p><strong>Target:</strong> 6 peer ratings per member per week.</p>
         </section>
 
@@ -314,19 +314,13 @@
             <div class="grid">
               <label>
                 Deliverables (1-10)
-                <input id="deliverables" type="number" min="1" max="10" value="8" required />
+                <small>Quality & Deadlines</small>
+                <input id="deliverables" type="number" min="1" max="10" value="10" required />
               </label>
               <label>
-                Commitment (1-10)
-                <input id="commitment" type="number" min="1" max="10" value="8" required />
-              </label>
-              <label>
-                Cooperation (1-10)
-                <input id="cooperation" type="number" min="1" max="10" value="8" required />
-              </label>
-              <label>
-                Initiative (1-10)
-                <input id="initiative" type="number" min="1" max="10" value="8" required />
+                Teamwork (1-10)
+                <small>Commitment & Helpfulness</small>
+                <input id="teamwork" type="number" min="1" max="10" value="10" required />
               </label>
             </div>
             <button type="submit" class="btn-primary"><i data-lucide="send"></i> Submit Evaluation</button>
@@ -365,10 +359,8 @@
                 <th>Week</th>
                 <th>Evaluator</th>
                 <th>Reviewed</th>
-                <th>Deliv</th>
-                <th>Comm</th>
-                <th>Coop</th>
-                <th>Init</th>
+                <th>Deliverables</th>
+                <th>Teamwork</th>
                 <th>Avg</th>
               </tr>
             </thead>
@@ -444,9 +436,7 @@
 
         const scores = {
           deliverables: readScore('deliverables'),
-          commitment: readScore('commitment'),
-          cooperation: readScore('cooperation'),
-          initiative: readScore('initiative')
+          teamwork: readScore('teamwork')
         };
 
         if (
@@ -559,10 +549,8 @@
           row.innerHTML = "<td>" + item.week + "</td>" +
                          "<td>" + item.evaluator + "</td>" +
                          "<td>" + item.evaluatee + "</td>" +
-                         "<td>" + item.deliverables + "</td>" +
-                         "<td>" + item.commitment + "</td>" +
-                         "<td>" + item.cooperation + "</td>" +
-                         "<td>" + item.initiative + "</td>" +
+                         "<td>" + (item.deliverables || '-') + "</td>" +
+                         "<td>" + (item.teamwork || '-') + "</td>" +
                          "<td class='score-tag'>" + item.total.toFixed(2) + "</td>";
           recordsBody.appendChild(row);
         });
