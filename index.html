@@ -282,13 +282,14 @@
       }
 
       function currentWeek() {
-        const MILLISECONDS_PER_DAY = 86400000;
+        const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
         const date = new Date();
         const utcDate = new Date(
           Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
         );
-        const day = utcDate.getUTCDay() || 7;
-        utcDate.setUTCDate(utcDate.getUTCDate() + 4 - day);
+        const day = utcDate.getUTCDay();
+        const isoDay = day === 0 ? 7 : day;
+        utcDate.setUTCDate(utcDate.getUTCDate() + 4 - isoDay);
         const yearStart = new Date(Date.UTC(utcDate.getUTCFullYear(), 0, 1));
         const weekNumber = Math.ceil(((utcDate - yearStart) / MILLISECONDS_PER_DAY + 1) / 7);
         return `${utcDate.getUTCFullYear()}-W${String(weekNumber).padStart(2, '0')}`;
@@ -296,7 +297,7 @@
 
       function average(numbers) {
         if (numbers.length === 0) {
-          return Number.NaN;
+          throw new Error('Average requires at least one value.');
         }
         return numbers.reduce((sum, n) => sum + n, 0) / numbers.length;
       }
