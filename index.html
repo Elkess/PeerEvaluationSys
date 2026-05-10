@@ -10,18 +10,18 @@
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.292.0/dist/umd/lucide.min.js"></script>
     <style>
       :root {
-        --primary: #2563eb;
-        --primary-hover: #1d4ed8;
-        --secondary: #64748b;
-        --bg: #f8fafc;
-        --card-bg: #ffffff;
-        --text-main: #1e293b;
-        --text-muted: #64748b;
-        --border: #e2e8f0;
+        --primary: #3b82f6;
+        --primary-hover: #60a5fa;
+        --secondary: #94a3b8;
+        --bg: #0f172a;
+        --card-bg: #1e293b;
+        --text-main: #f1f5f9;
+        --text-muted: #94a3b8;
+        --border: #334155;
         --success: #10b981;
         --warning: #f59e0b;
         --radius: 12px;
-        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
       }
 
       * {
@@ -156,6 +156,8 @@
         padding: 0.625rem;
         border-radius: 8px;
         border: 1px solid var(--border);
+        background-color: #0f172a;
+        color: var(--text-main);
         font-size: 0.95rem;
         transition: border-color 0.2s, box-shadow 0.2s;
         width: 100%;
@@ -191,22 +193,22 @@
       }
 
       .btn-secondary {
-        background: white;
+        background: #1e293b;
         border-color: var(--border);
         color: var(--text-main);
       }
 
       .btn-secondary:hover {
-        background: var(--bg);
+        background: #334155;
       }
 
       .btn-danger {
-        color: #ef4444;
-        background: #fef2f2;
+        color: #f87171;
+        background: #450a0a;
       }
       
       .btn-danger:hover {
-        background: #fee2e2;
+        background: #7f1d1d;
       }
 
       .user-chip-list {
@@ -219,7 +221,7 @@
       }
 
       .user-chip {
-        background: #f1f5f9;
+        background: #334155;
         padding: 4px 12px;
         border-radius: 20px;
         font-size: 0.875rem;
@@ -255,12 +257,31 @@
         font-weight: 600;
       }
 
-      .status-complete { background: #d1fae5; color: #065f46; }
-      .status-pending { background: #fef3c7; color: #92400e; }
+      .progress-container {
+        width: 100%;
+        background-color: #334155;
+        border-radius: 4px;
+        height: 6px;
+        overflow: hidden;
+        margin-top: 4px;
+      }
+
+      .progress-bar {
+        height: 100%;
+        background-color: var(--primary);
+        transition: width 0.3s ease;
+      }
+
+      .progress-bar.complete {
+        background-color: var(--success);
+      }
+
+      .status-complete { background: #064e3b; color: #6ee7b7; }
+      .status-pending { background: #78350f; color: #fcd34d; }
 
       .score-tag {
         font-weight: 700;
-        color: var(--primary);
+        color: #60a5fa;
       }
 
       .notice {
@@ -270,8 +291,8 @@
         font-size: 0.875rem;
       }
 
-      .notice-success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
-      .notice-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+      .notice-success { background: #064e3b; color: #6ee7b7; border: 1px solid #065f46; }
+      .notice-error { background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b; }
 
       .table-container {
         overflow-x: auto;
@@ -717,10 +738,15 @@
           const peerCount = rowData.totals.length;
           const weeklyScore = average(rowData.totals).toFixed(2);
           const isComplete = peerCount >= TARGET_PEER_COUNT;
+          const progressPercent = Math.min((peerCount / TARGET_PEER_COUNT) * 100, 100);
+          
           const row = document.createElement('tr');
           row.innerHTML = "<td>" + rowData.week + "</td>" +
                          "<td><strong>" + rowData.evaluatee + "</strong></td>" +
-                         "<td>" + peerCount + "/" + TARGET_PEER_COUNT + "</td>" +
+                         "<td>" + 
+                           peerCount + "/" + TARGET_PEER_COUNT + 
+                           "<div class='progress-container'><div class='progress-bar" + (isComplete ? " complete" : "") + "' style='width: " + progressPercent + "%'></div></div>" +
+                         "</td>" +
                          "<td class='score-tag'>" + weeklyScore + "</td>" +
                          "<td><span class='status-badge " + (isComplete ? 'status-complete' : 'status-pending') + "'>" + (isComplete ? 'Complete' : 'Pending') + "</span></td>";
           scoreboardBody.appendChild(row);
