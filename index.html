@@ -195,6 +195,9 @@
 
     <script>
       const STORAGE_KEY = 'peer-evaluation-data-v1';
+      const MIN_SCORE = 1;
+      const MAX_SCORE = 10;
+      const TARGET_PEER_COUNT = 6;
       const state = loadState();
 
       const userForm = document.getElementById('user-form');
@@ -249,8 +252,12 @@
           initiative: readScore('initiative')
         };
 
-        if (Object.values(scores).some((score) => Number.isNaN(score) || score < 1 || score > 10)) {
-          message.textContent = 'Scores must be numbers between 1 and 10.';
+        if (
+          Object.values(scores).some(
+            (score) => Number.isNaN(score) || score < MIN_SCORE || score > MAX_SCORE
+          )
+        ) {
+          message.textContent = `Scores must be numbers between ${MIN_SCORE} and ${MAX_SCORE}.`;
           return;
         }
 
@@ -297,7 +304,7 @@
 
       function average(numbers) {
         if (numbers.length === 0) {
-          throw new Error('Average requires at least one value.');
+          throw new Error('Cannot compute average of an empty array.');
         }
         return numbers.reduce((sum, n) => sum + n, 0) / numbers.length;
       }
@@ -314,6 +321,7 @@
             evaluations: Array.isArray(parsed.evaluations) ? parsed.evaluations : []
           };
         } catch {
+          console.error('Could not parse saved peer evaluation data from localStorage.');
           return { users: [], evaluations: [] };
         }
       }
@@ -397,9 +405,9 @@
           [
             rowData.week,
             rowData.evaluatee,
-            `${peerCount}/6`,
+            `${peerCount}/${TARGET_PEER_COUNT}`,
             weeklyScore,
-            peerCount === 6 ? 'Complete' : 'Pending'
+            peerCount === TARGET_PEER_COUNT ? 'Complete' : 'Pending'
           ].forEach((value) => {
             const cell = document.createElement('td');
             cell.textContent = String(value);
