@@ -214,11 +214,17 @@
       userForm.addEventListener('submit', (event) => {
         event.preventDefault();
         const name = userNameInput.value.trim();
-        if (!name || state.users.includes(name)) {
+        if (!name) {
+          message.textContent = 'Team member name is required.';
+          return;
+        }
+        if (state.users.includes(name)) {
+          message.textContent = 'That team member already exists.';
           return;
         }
         state.users.push(name);
         userNameInput.value = '';
+        message.textContent = 'Team member added.';
         persistAndRender();
       });
 
@@ -272,14 +278,18 @@
       }
 
       function currentWeek() {
+        const MILLISECONDS_PER_DAY = 86400000;
         const date = new Date();
         const firstDay = new Date(Date.UTC(date.getFullYear(), 0, 1));
-        const dayOffset = Math.floor((date - firstDay) / 86400000);
+        const dayOffset = Math.floor((date - firstDay) / MILLISECONDS_PER_DAY);
         const weekNumber = Math.ceil((dayOffset + firstDay.getUTCDay() + 1) / 7);
         return `${date.getFullYear()}-W${String(weekNumber).padStart(2, '0')}`;
       }
 
       function average(numbers) {
+        if (numbers.length === 0) {
+          return 0;
+        }
         return numbers.reduce((sum, n) => sum + n, 0) / numbers.length;
       }
 

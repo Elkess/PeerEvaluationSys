@@ -16,4 +16,4 @@ A minimal browser-based Peer Evaluation System for startup teams.
 
 ## Run locally
 
-Open `/home/runner/work/PeerEvaluationSys/PeerEvaluationSys/index.html` in a browser.
+Open `index.html` in a browser.
