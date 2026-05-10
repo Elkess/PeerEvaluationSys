@@ -274,7 +274,7 @@
       <div class="card-stack">
         <section class="intro-card">
           <h2>Welcome</h2>
-          <p>Maintain high standards through objective peer evaluations on two benchmarks: Deliverables and Teamwork.</p>
+          <p>Maintain high standards through objective peer evaluations on four benchmarks: Deliverables, Commitment, Cooperation, and Initiative.</p>
           <p><strong>Target:</strong> 6 peer ratings per member per week.</p>
         </section>
 
@@ -318,9 +318,19 @@
                 <input id="deliverables" type="number" min="1" max="10" value="10" required />
               </label>
               <label>
-                Teamwork (1-10)
-                <small>Commitment & Helpfulness</small>
-                <input id="teamwork" type="number" min="1" max="10" value="10" required />
+                Commitment (1-10)
+                <small>Attendance & Focus</small>
+                <input id="commitment" type="number" min="1" max="10" value="10" required />
+              </label>
+              <label>
+                Cooperation (1-10)
+                <small>Communication & Help</small>
+                <input id="cooperation" type="number" min="1" max="10" value="10" required />
+              </label>
+              <label>
+                Initiative (1-10)
+                <small>Proactivity & Problems</small>
+                <input id="initiative" type="number" min="1" max="10" value="10" required />
               </label>
             </div>
             <button type="submit" class="btn-primary"><i data-lucide="send"></i> Submit Evaluation</button>
@@ -359,9 +369,12 @@
                 <th>Week</th>
                 <th>Evaluator</th>
                 <th>Reviewed</th>
-                <th>Deliverables</th>
-                <th>Teamwork</th>
+                <th>Deliv</th>
+                <th>Comm</th>
+                <th>Coop</th>
+                <th>Init</th>
                 <th>Avg</th>
+                <th></th>
               </tr>
             </thead>
             <tbody id="records-body"></tbody>
@@ -391,8 +404,16 @@
       const scoreboardBody = document.getElementById('scoreboard-body');
       const message = document.getElementById('form-message');
       const clearButton = document.getElementById('clear-data');
+      const ADMIN_CODE = "Admin123";
 
       weekInput.value = currentWeek();
+
+      function verifyAdmin() {
+        const input = prompt("Enter Admin Code:");
+        if (input === ADMIN_CODE) return true;
+        alert("Invalid Admin Code.");
+        return false;
+      }
 
       function showMessage(text, type = 'success') {
         message.textContent = text;
@@ -436,7 +457,9 @@
 
         const scores = {
           deliverables: readScore('deliverables'),
-          teamwork: readScore('teamwork')
+          commitment: readScore('commitment'),
+          cooperation: readScore('cooperation'),
+          initiative: readScore('initiative')
         };
 
         if (
@@ -462,6 +485,7 @@
       });
 
       clearButton.addEventListener('click', () => {
+        if (!verifyAdmin()) return;
         if (!window.confirm('Clear all users and evaluation records?')) {
           return;
         }
@@ -470,6 +494,23 @@
         showMessage('All data cleared.');
         persistAndRender();
       });
+
+      window.deleteUser = function(name) {
+        if (!verifyAdmin()) return;
+        if (!confirm(`Delete user "${name}" and all their evaluations?`)) return;
+        state.users = state.users.filter(u => u !== name);
+        state.evaluations = state.evaluations.filter(e => e.evaluator !== name && e.evaluatee !== name);
+        showMessage(`User ${name} deleted.`);
+        persistAndRender();
+      }
+
+      window.deleteEvaluation = function(timestamp) {
+        if (!verifyAdmin()) return;
+        if (!confirm(`Delete this evaluation?`)) return;
+        state.evaluations = state.evaluations.filter(e => e.submittedAt !== timestamp);
+        showMessage(`Evaluation deleted.`);
+        persistAndRender();
+      }
 
       function readScore(id) {
         return Number(document.getElementById(id).value);
@@ -534,7 +575,7 @@
         state.users.forEach((name) => {
           const li = document.createElement('li');
           li.className = 'user-chip';
-          li.innerHTML = '<i data-lucide="user" style="width:14px;height:14px"></i> ' + name;
+          li.innerHTML = `<i data-lucide="user" style="width:14px;height:14px"></i> ${name} <i data-lucide="x" style="width:12px;height:12px;cursor:pointer;margin-left:4px;color:#ef4444" onclick="deleteUser('${name}')"></i>`;
           userList.appendChild(li);
         });
         lucide.createIcons();
@@ -550,10 +591,14 @@
                          "<td>" + item.evaluator + "</td>" +
                          "<td>" + item.evaluatee + "</td>" +
                          "<td>" + (item.deliverables || '-') + "</td>" +
-                         "<td>" + (item.teamwork || '-') + "</td>" +
-                         "<td class='score-tag'>" + item.total.toFixed(2) + "</td>";
+                         "<td>" + (item.commitment || '-') + "</td>" +
+                         "<td>" + (item.cooperation || '-') + "</td>" +
+                         "<td>" + (item.initiative || '-') + "</td>" +
+                         "<td class='score-tag'>" + item.total.toFixed(2) + "</td>" +
+                         "<td><i data-lucide='trash-2' style='width:14px;height:14px;cursor:pointer;color:#ef4444' onclick=\"deleteEvaluation('" + item.submittedAt + "')\"></i></td>";
           recordsBody.appendChild(row);
         });
+        lucide.createIcons();
       }
 
       function renderScoreboard() {
