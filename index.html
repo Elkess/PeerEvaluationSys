@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Peer Evaluation System</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f7fb;
+        color: #1f2937;
+      }
+      main {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      h1,
+      h2 {
+        margin: 0 0 12px;
+      }
+      section {
+        background: #fff;
+        border: 1px solid #dbe3ef;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      p {
+        line-height: 1.5;
+      }
+      form {
+        display: grid;
+        gap: 10px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 10px;
+      }
+      label {
+        display: grid;
+        gap: 6px;
+        font-size: 0.95rem;
+      }
+      input,
+      select,
+      button {
+        font: inherit;
+        padding: 8px;
+        border-radius: 6px;
+        border: 1px solid #bcc8da;
+      }
+      button {
+        cursor: pointer;
+        background: #2563eb;
+        color: #fff;
+        border-color: #1f55c8;
+      }
+      button.secondary {
+        background: #eef2ff;
+        color: #1f2937;
+        border-color: #c8d2f0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 0.92rem;
+      }
+      ul {
+        margin: 8px 0 0;
+      }
+      .notice {
+        margin-top: 8px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section>
+        <h1>Peer Evaluation System</h1>
+        <p>
+          To maintain high standards, each weekend after the weekly meeting,
+          every team member submits objective peer evaluations on four
+          benchmarks: Deliverables, Commitment, Cooperation, and Initiative.
+        </p>
+        <p>
+          Weekly score = average of ratings submitted by six peers. Records are
+          archived for leadership decisions, milestones, and responsibilities.
+        </p>
+      </section>
+
+      <section>
+        <h2>1) Team Management</h2>
+        <form id="user-form">
+          <div class="grid">
+            <label>
+              Team member name
+              <input id="user-name" type="text" placeholder="Add team member" required />
+            </label>
+          </div>
+          <button type="submit">Add Member</button>
+        </form>
+        <ul id="user-list"></ul>
+      </section>
+
+      <section>
+        <h2>2) Submit Weekend Evaluation</h2>
+        <form id="evaluation-form">
+          <div class="grid">
+            <label>
+              Evaluator
+              <select id="evaluator" required></select>
+            </label>
+            <label>
+              Colleague being reviewed
+              <select id="evaluatee" required></select>
+            </label>
+            <label>
+              Week
+              <input id="week" type="week" required />
+            </label>
+          </div>
+          <div class="grid">
+            <label>
+              Deliverables (1-10)
+              <input id="deliverables" type="number" min="1" max="10" value="8" required />
+            </label>
+            <label>
+              Commitment (1-10)
+              <input id="commitment" type="number" min="1" max="10" value="8" required />
+            </label>
+            <label>
+              Cooperation (1-10)
+              <input id="cooperation" type="number" min="1" max="10" value="8" required />
+            </label>
+            <label>
+              Initiative (1-10)
+              <input id="initiative" type="number" min="1" max="10" value="8" required />
+            </label>
+          </div>
+          <button type="submit">Submit Evaluation</button>
+        </form>
+        <div class="notice" id="form-message" aria-live="polite"></div>
+      </section>
+
+      <section>
+        <h2>3) Weekly Scoreboard (6 Peer Ratings Target)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Week</th>
+              <th>Member</th>
+              <th>Peer Ratings</th>
+              <th>Weekly Score</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="scoreboard-body"></tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>4) Archived Evaluation Records</h2>
+        <button id="clear-data" type="button" class="secondary">Clear All Data</button>
+        <table>
+          <thead>
+            <tr>
+              <th>Week</th>
+              <th>Evaluator</th>
+              <th>Reviewed</th>
+              <th>Deliverables</th>
+              <th>Commitment</th>
+              <th>Cooperation</th>
+              <th>Initiative</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody id="records-body"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <script>
+      const STORAGE_KEY = 'peer-evaluation-data-v1';
+      const state = loadState();
+
+      const userForm = document.getElementById('user-form');
+      const userNameInput = document.getElementById('user-name');
+      const userList = document.getElementById('user-list');
+      const evaluationForm = document.getElementById('evaluation-form');
+      const evaluatorSelect = document.getElementById('evaluator');
+      const evaluateeSelect = document.getElementById('evaluatee');
+      const weekInput = document.getElementById('week');
+      const recordsBody = document.getElementById('records-body');
+      const scoreboardBody = document.getElementById('scoreboard-body');
+      const message = document.getElementById('form-message');
+      const clearButton = document.getElementById('clear-data');
+
+      weekInput.value = currentWeek();
+
+      userForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = userNameInput.value.trim();
+        if (!name || state.users.includes(name)) {
+          return;
+        }
+        state.users.push(name);
+        userNameInput.value = '';
+        persistAndRender();
+      });
+
+      evaluationForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const evaluator = evaluatorSelect.value;
+        const evaluatee = evaluateeSelect.value;
+        if (!evaluator || !evaluatee || evaluator === evaluatee) {
+          message.textContent = 'Evaluator and reviewed colleague must be different.';
+          return;
+        }
+
+        const scores = {
+          deliverables: readScore('deliverables'),
+          commitment: readScore('commitment'),
+          cooperation: readScore('cooperation'),
+          initiative: readScore('initiative')
+        };
+
+        if (Object.values(scores).some((score) => Number.isNaN(score) || score < 1 || score > 10)) {
+          message.textContent = 'Scores must be numbers between 1 and 10.';
+          return;
+        }
+
+        state.evaluations.push({
+          week: weekInput.value,
+          evaluator,
+          evaluatee,
+          ...scores,
+          total: average(Object.values(scores)),
+          submittedAt: new Date().toISOString()
+        });
+
+        message.textContent = 'Evaluation saved and archived.';
+        persistAndRender();
+      });
+
+      clearButton.addEventListener('click', () => {
+        if (!window.confirm('Clear all users and evaluation records?')) {
+          return;
+        }
+        state.users = [];
+        state.evaluations = [];
+        message.textContent = 'All data cleared.';
+        persistAndRender();
+      });
+
+      function readScore(id) {
+        return Number(document.getElementById(id).value);
+      }
+
+      function currentWeek() {
+        const date = new Date();
+        const firstDay = new Date(Date.UTC(date.getFullYear(), 0, 1));
+        const dayOffset = Math.floor((date - firstDay) / 86400000);
+        const weekNumber = Math.ceil((dayOffset + firstDay.getUTCDay() + 1) / 7);
+        return `${date.getFullYear()}-W${String(weekNumber).padStart(2, '0')}`;
+      }
+
+      function average(numbers) {
+        return numbers.reduce((sum, n) => sum + n, 0) / numbers.length;
+      }
+
+      function loadState() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          return { users: [], evaluations: [] };
+        }
+        try {
+          const parsed = JSON.parse(raw);
+          return {
+            users: Array.isArray(parsed.users) ? parsed.users : [],
+            evaluations: Array.isArray(parsed.evaluations) ? parsed.evaluations : []
+          };
+        } catch {
+          return { users: [], evaluations: [] };
+        }
+      }
+
+      function saveState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+
+      function setOptions(selectElement) {
+        selectElement.replaceChildren();
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Select member';
+        selectElement.appendChild(placeholder);
+
+        state.users.forEach((name) => {
+          const option = document.createElement('option');
+          option.value = name;
+          option.textContent = name;
+          selectElement.appendChild(option);
+        });
+      }
+
+      function renderUsers() {
+        userList.replaceChildren();
+        state.users.forEach((name) => {
+          const li = document.createElement('li');
+          li.textContent = name;
+          userList.appendChild(li);
+        });
+      }
+
+      function renderRecords() {
+        recordsBody.replaceChildren();
+        const sorted = [...state.evaluations].sort((a, b) => b.week.localeCompare(a.week));
+
+        sorted.forEach((item) => {
+          const row = document.createElement('tr');
+          [
+            item.week,
+            item.evaluator,
+            item.evaluatee,
+            item.deliverables,
+            item.commitment,
+            item.cooperation,
+            item.initiative,
+            item.total.toFixed(2)
+          ].forEach((value) => {
+            const cell = document.createElement('td');
+            cell.textContent = String(value);
+            row.appendChild(cell);
+          });
+          recordsBody.appendChild(row);
+        });
+      }
+
+      function renderScoreboard() {
+        scoreboardBody.replaceChildren();
+        const grouped = new Map();
+
+        state.evaluations.forEach((item) => {
+          const key = `${item.week}|${item.evaluatee}`;
+          if (!grouped.has(key)) {
+            grouped.set(key, {
+              week: item.week,
+              evaluatee: item.evaluatee,
+              totals: []
+            });
+          }
+          grouped.get(key).totals.push(item.total);
+        });
+
+        const rows = [...grouped.values()].sort(
+          (a, b) => b.week.localeCompare(a.week) || a.evaluatee.localeCompare(b.evaluatee)
+        );
+
+        rows.forEach((rowData) => {
+          const peerCount = rowData.totals.length;
+          const weeklyScore = average(rowData.totals).toFixed(2);
+          const row = document.createElement('tr');
+          [
+            rowData.week,
+            rowData.evaluatee,
+            `${peerCount}/6`,
+            weeklyScore,
+            peerCount === 6 ? 'Complete' : 'Pending'
+          ].forEach((value) => {
+            const cell = document.createElement('td');
+            cell.textContent = String(value);
+            row.appendChild(cell);
+          });
+          scoreboardBody.appendChild(row);
+        });
+      }
+
+      function persistAndRender() {
+        saveState();
+        renderUsers();
+        setOptions(evaluatorSelect);
+        setOptions(evaluateeSelect);
+        renderRecords();
+        renderScoreboard();
+      }
+
+      persistAndRender();
+    </script>
+  </body>
+</html>
