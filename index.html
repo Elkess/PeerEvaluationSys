@@ -233,7 +233,11 @@
 
         const evaluator = evaluatorSelect.value;
         const evaluatee = evaluateeSelect.value;
-        if (!evaluator || !evaluatee || evaluator === evaluatee) {
+        if (!evaluator || !evaluatee) {
+          message.textContent = 'Please select both evaluator and reviewed colleague.';
+          return;
+        }
+        if (evaluator === evaluatee) {
           message.textContent = 'Evaluator and reviewed colleague must be different.';
           return;
         }
@@ -280,15 +284,19 @@
       function currentWeek() {
         const MILLISECONDS_PER_DAY = 86400000;
         const date = new Date();
-        const firstDay = new Date(Date.UTC(date.getFullYear(), 0, 1));
-        const dayOffset = Math.floor((date - firstDay) / MILLISECONDS_PER_DAY);
-        const weekNumber = Math.ceil((dayOffset + firstDay.getUTCDay() + 1) / 7);
-        return `${date.getFullYear()}-W${String(weekNumber).padStart(2, '0')}`;
+        const utcDate = new Date(
+          Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+        );
+        const day = utcDate.getUTCDay() || 7;
+        utcDate.setUTCDate(utcDate.getUTCDate() + 4 - day);
+        const yearStart = new Date(Date.UTC(utcDate.getUTCFullYear(), 0, 1));
+        const weekNumber = Math.ceil(((utcDate - yearStart) / MILLISECONDS_PER_DAY + 1) / 7);
+        return `${utcDate.getUTCFullYear()}-W${String(weekNumber).padStart(2, '0')}`;
       }
 
       function average(numbers) {
         if (numbers.length === 0) {
-          return 0;
+          return Number.NaN;
         }
         return numbers.reduce((sum, n) => sum + n, 0) / numbers.length;
       }
