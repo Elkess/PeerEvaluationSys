@@ -4,196 +4,384 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Peer Evaluation System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.292.0/dist/umd/lucide.min.js"></script>
     <style>
       :root {
-        color-scheme: light;
+        --primary: #2563eb;
+        --primary-hover: #1d4ed8;
+        --secondary: #64748b;
+        --bg: #f8fafc;
+        --card-bg: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --border: #e2e8f0;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --radius: 12px;
+        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
       }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f5f7fb;
-        color: #1f2937;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text-main);
+        line-height: 1.6;
       }
+
+      .navbar {
+        background: var(--card-bg);
+        border-bottom: 1px solid var(--border);
+        padding: 1rem 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .navbar h1 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--primary);
+      }
+
       main {
-        max-width: 1000px;
+        max-width: 1200px;
         margin: 0 auto;
-        padding: 24px;
-      }
-      h1,
-      h2 {
-        margin: 0 0 12px;
-      }
-      section {
-        background: #fff;
-        border: 1px solid #dbe3ef;
-        border-radius: 10px;
-        padding: 16px;
-        margin-bottom: 16px;
-      }
-      p {
-        line-height: 1.5;
-      }
-      form {
+        padding: 2rem;
         display: grid;
-        gap: 10px;
+        grid-template-columns: 1fr 2fr;
+        gap: 2rem;
       }
+
+      @media (max-width: 900px) {
+        main {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      section {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        margin-bottom: 0;
+      }
+
+      .full-width {
+        grid-column: 1 / -1;
+      }
+
+      .intro-card {
+        background: linear-gradient(135deg, var(--primary), #4f46e5);
+        color: white;
+        border: none;
+      }
+
+      .intro-card h2 { margin-top: 0; }
+      .intro-card p { opacity: 0.9; font-size: 0.95rem; }
+
+      h2 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+        color: var(--text-main);
+      }
+
+      h2 i {
+        color: var(--primary);
+      }
+
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
       }
+
       label {
-        display: grid;
+        display: flex;
+        flex-direction: column;
         gap: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-muted);
+      }
+
+      input, select {
+        padding: 0.625rem;
+        border-radius: 8px;
+        border: 1px solid var(--border);
         font-size: 0.95rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        width: 100%;
       }
-      input,
-      select,
-      button {
-        font: inherit;
-        padding: 8px;
-        border-radius: 6px;
-        border: 1px solid #bcc8da;
+
+      input:focus, select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
       }
+
       button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0.625rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
         cursor: pointer;
-        background: #2563eb;
-        color: #fff;
-        border-color: #1f55c8;
+        transition: all 0.2s;
+        border: 1px solid transparent;
       }
-      button.secondary {
-        background: #eef2ff;
-        color: #1f2937;
-        border-color: #c8d2f0;
+
+      .btn-primary {
+        background: var(--primary);
+        color: white;
       }
+
+      .btn-primary:hover {
+        background: var(--primary-hover);
+      }
+
+      .btn-secondary {
+        background: white;
+        border-color: var(--border);
+        color: var(--text-main);
+      }
+
+      .btn-secondary:hover {
+        background: var(--bg);
+      }
+
+      .btn-danger {
+        color: #ef4444;
+        background: #fef2f2;
+      }
+      
+      .btn-danger:hover {
+        background: #fee2e2;
+      }
+
+      .user-chip-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 1rem;
+        padding: 0;
+        list-style: none;
+      }
+
+      .user-chip {
+        background: #f1f5f9;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid var(--border);
+      }
+
       table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 8px;
+        font-size: 0.875rem;
       }
-      th,
-      td {
+
+      th {
         text-align: left;
-        padding: 8px;
-        border-bottom: 1px solid #e5e7eb;
-        font-size: 0.92rem;
-      }
-      ul {
-        margin: 8px 0 0;
-      }
-      .notice {
-        margin-top: 8px;
+        padding: 0.75rem;
+        border-bottom: 2px solid var(--border);
+        color: var(--text-muted);
         font-weight: 600;
+      }
+
+      td {
+        padding: 0.75rem;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .status-badge {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .status-complete { background: #d1fae5; color: #065f46; }
+      .status-pending { background: #fef3c7; color: #92400e; }
+
+      .score-tag {
+        font-weight: 700;
+        color: var(--primary);
+      }
+
+      .notice {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+      }
+
+      .notice-success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+      .notice-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+      .table-container {
+        overflow-x: auto;
+      }
+
+      .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+      
+      .header-actions h2 { margin: 0; }
+
+      .card-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
       }
     </style>
   </head>
   <body>
+    <nav class="navbar">
+      <i data-lucide="users"></i>
+      <h1>Peer Eval</h1>
+    </nav>
+
     <main>
-      <section>
-        <h1>Peer Evaluation System</h1>
-        <p>
-          To maintain high standards, each weekend after the weekly meeting,
-          every team member submits objective peer evaluations on four
-          benchmarks: Deliverables, Commitment, Cooperation, and Initiative.
-        </p>
-        <p>
-          Weekly score = average of ratings submitted by six peers. Records are
-          archived for leadership decisions, milestones, and responsibilities.
-        </p>
-      </section>
+      <div class="card-stack">
+        <section class="intro-card">
+          <h2>Welcome</h2>
+          <p>Maintain high standards through objective peer evaluations on four benchmarks: Deliverables, Commitment, Cooperation, and Initiative.</p>
+          <p><strong>Target:</strong> 6 peer ratings per member per week.</p>
+        </section>
 
-      <section>
-        <h2>1) Team Management</h2>
-        <form id="user-form">
-          <div class="grid">
-            <label>
-              Team member name
-              <input id="user-name" type="text" placeholder="Add team member" required />
-            </label>
+        <section>
+          <h2><i data-lucide="user-plus"></i> Team Management</h2>
+          <form id="user-form">
+            <div class="grid">
+              <label>
+                New Member Name
+                <input id="user-name" type="text" placeholder="e.g. Alex Smith" required />
+              </label>
+            </div>
+            <button type="submit" class="btn-primary"><i data-lucide="plus"></i> Add Member</button>
+          </form>
+          <ul id="user-list" class="user-chip-list"></ul>
+        </section>
+      </div>
+
+      <div class="card-stack">
+        <section>
+          <h2><i data-lucide="file-edit"></i> Submit Evaluation</h2>
+          <form id="evaluation-form">
+            <div class="grid">
+              <label>
+                Evaluator
+                <select id="evaluator" required></select>
+              </label>
+              <label>
+                Reviewing
+                <select id="evaluatee" required></select>
+              </label>
+              <label>
+                Week
+                <input id="week" type="week" required />
+              </label>
+            </div>
+            <div class="grid">
+              <label>
+                Deliverables (1-10)
+                <input id="deliverables" type="number" min="1" max="10" value="8" required />
+              </label>
+              <label>
+                Commitment (1-10)
+                <input id="commitment" type="number" min="1" max="10" value="8" required />
+              </label>
+              <label>
+                Cooperation (1-10)
+                <input id="cooperation" type="number" min="1" max="10" value="8" required />
+              </label>
+              <label>
+                Initiative (1-10)
+                <input id="initiative" type="number" min="1" max="10" value="8" required />
+              </label>
+            </div>
+            <button type="submit" class="btn-primary"><i data-lucide="send"></i> Submit Evaluation</button>
+          </form>
+          <div id="form-message" aria-live="polite"></div>
+        </section>
+
+        <section>
+          <h2><i data-lucide="layout-dashboard"></i> Weekly Scoreboard</h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Week</th>
+                  <th>Member</th>
+                  <th>Ratings</th>
+                  <th>Avg Score</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="scoreboard-body"></tbody>
+            </table>
           </div>
-          <button type="submit">Add Member</button>
-        </form>
-        <ul id="user-list"></ul>
-      </section>
+        </section>
+      </div>
 
-      <section>
-        <h2>2) Submit Weekend Evaluation</h2>
-        <form id="evaluation-form">
-          <div class="grid">
-            <label>
-              Evaluator
-              <select id="evaluator" required></select>
-            </label>
-            <label>
-              Colleague being reviewed
-              <select id="evaluatee" required></select>
-            </label>
-            <label>
-              Week
-              <input id="week" type="week" required />
-            </label>
-          </div>
-          <div class="grid">
-            <label>
-              Deliverables (1-10)
-              <input id="deliverables" type="number" min="1" max="10" value="8" required />
-            </label>
-            <label>
-              Commitment (1-10)
-              <input id="commitment" type="number" min="1" max="10" value="8" required />
-            </label>
-            <label>
-              Cooperation (1-10)
-              <input id="cooperation" type="number" min="1" max="10" value="8" required />
-            </label>
-            <label>
-              Initiative (1-10)
-              <input id="initiative" type="number" min="1" max="10" value="8" required />
-            </label>
-          </div>
-          <button type="submit">Submit Evaluation</button>
-        </form>
-        <div class="notice" id="form-message" aria-live="polite"></div>
-      </section>
-
-      <section>
-        <h2>3) Weekly Scoreboard (6 Peer Ratings Target)</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Week</th>
-              <th>Member</th>
-              <th>Peer Ratings</th>
-              <th>Weekly Score</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="scoreboard-body"></tbody>
-        </table>
-      </section>
-
-      <section>
-        <h2>4) Archived Evaluation Records</h2>
-        <button id="clear-data" type="button" class="secondary">Clear All Data</button>
-        <table>
-          <thead>
-            <tr>
-              <th>Week</th>
-              <th>Evaluator</th>
-              <th>Reviewed</th>
-              <th>Deliverables</th>
-              <th>Commitment</th>
-              <th>Cooperation</th>
-              <th>Initiative</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody id="records-body"></tbody>
-        </table>
+      <section class="full-width">
+        <div class="header-actions">
+          <h2><i data-lucide="archive"></i> Evaluation Archive</h2>
+          <button id="clear-data" type="button" class="btn-danger"><i data-lucide="trash-2"></i> Clear All Data</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Week</th>
+                <th>Evaluator</th>
+                <th>Reviewed</th>
+                <th>Deliv</th>
+                <th>Comm</th>
+                <th>Coop</th>
+                <th>Init</th>
+                <th>Avg</th>
+              </tr>
+            </thead>
+            <tbody id="records-body"></tbody>
+          </table>
+        </div>
       </section>
     </main>
 
     <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+
       const STORAGE_KEY = 'peer-evaluation-data-v1';
       const MIN_SCORE = 1;
       const MAX_SCORE = 10;
@@ -214,20 +402,29 @@
 
       weekInput.value = currentWeek();
 
+      function showMessage(text, type = 'success') {
+        message.textContent = text;
+        message.className = `notice notice-${type}`;
+        setTimeout(() => {
+          message.textContent = '';
+          message.className = '';
+        }, 5000);
+      }
+
       userForm.addEventListener('submit', (event) => {
         event.preventDefault();
         const name = userNameInput.value.trim();
         if (!name) {
-          message.textContent = 'Team member name is required.';
+          showMessage('Team member name is required.', 'error');
           return;
         }
         if (state.users.includes(name)) {
-          message.textContent = 'That team member already exists.';
+          showMessage('That team member already exists.', 'error');
           return;
         }
         state.users.push(name);
         userNameInput.value = '';
-        message.textContent = 'Team member added.';
+        showMessage('Team member added.');
         persistAndRender();
       });
 
@@ -237,11 +434,11 @@
         const evaluator = evaluatorSelect.value;
         const evaluatee = evaluateeSelect.value;
         if (!evaluator || !evaluatee) {
-          message.textContent = 'Please select both evaluator and reviewed colleague.';
+          showMessage('Please select both evaluator and reviewed colleague.', 'error');
           return;
         }
         if (evaluator === evaluatee) {
-          message.textContent = 'Evaluator and reviewed colleague must be different.';
+          showMessage('Evaluator and reviewed colleague must be different.', 'error');
           return;
         }
 
@@ -257,7 +454,7 @@
             (score) => Number.isNaN(score) || score < MIN_SCORE || score > MAX_SCORE
           )
         ) {
-          message.textContent = `Scores must be numbers between ${MIN_SCORE} and ${MAX_SCORE}.`;
+          showMessage(`Scores must be numbers between ${MIN_SCORE} and ${MAX_SCORE}.`, 'error');
           return;
         }
 
@@ -270,7 +467,7 @@
           submittedAt: new Date().toISOString()
         });
 
-        message.textContent = 'Evaluation saved and archived.';
+        showMessage('Evaluation saved and archived.');
         persistAndRender();
       });
 
@@ -280,7 +477,7 @@
         }
         state.users = [];
         state.evaluations = [];
-        message.textContent = 'All data cleared.';
+        showMessage('All data cleared.');
         persistAndRender();
       });
 
@@ -303,17 +500,13 @@
       }
 
       function average(numbers) {
-        if (numbers.length === 0) {
-          throw new Error('Cannot compute average of an empty array.');
-        }
+        if (numbers.length === 0) return 0;
         return numbers.reduce((sum, n) => sum + n, 0) / numbers.length;
       }
 
       function loadState() {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) {
-          return { users: [], evaluations: [] };
-        }
+        if (!raw) return { users: [], evaluations: [] };
         try {
           const parsed = JSON.parse(raw);
           return {
@@ -321,7 +514,6 @@
             evaluations: Array.isArray(parsed.evaluations) ? parsed.evaluations : []
           };
         } catch {
-          console.error('Could not parse saved peer evaluation data from localStorage.');
           return { users: [], evaluations: [] };
         }
       }
@@ -331,6 +523,7 @@
       }
 
       function setOptions(selectElement) {
+        const currentValue = selectElement.value;
         selectElement.replaceChildren();
         const placeholder = document.createElement('option');
         placeholder.value = '';
@@ -343,37 +536,34 @@
           option.textContent = name;
           selectElement.appendChild(option);
         });
+        selectElement.value = currentValue;
       }
 
       function renderUsers() {
         userList.replaceChildren();
         state.users.forEach((name) => {
           const li = document.createElement('li');
-          li.textContent = name;
+          li.className = 'user-chip';
+          li.innerHTML = '<i data-lucide="user" style="width:14px;height:14px"></i> ' + name;
           userList.appendChild(li);
         });
+        lucide.createIcons();
       }
 
       function renderRecords() {
         recordsBody.replaceChildren();
-        const sorted = [...state.evaluations].sort((a, b) => b.week.localeCompare(a.week));
+        const sorted = [...state.evaluations].sort((a, b) => b.week.localeCompare(a.week) || b.submittedAt.localeCompare(a.submittedAt));
 
         sorted.forEach((item) => {
           const row = document.createElement('tr');
-          [
-            item.week,
-            item.evaluator,
-            item.evaluatee,
-            item.deliverables,
-            item.commitment,
-            item.cooperation,
-            item.initiative,
-            item.total.toFixed(2)
-          ].forEach((value) => {
-            const cell = document.createElement('td');
-            cell.textContent = String(value);
-            row.appendChild(cell);
-          });
+          row.innerHTML = "<td>" + item.week + "</td>" +
+                         "<td>" + item.evaluator + "</td>" +
+                         "<td>" + item.evaluatee + "</td>" +
+                         "<td>" + item.deliverables + "</td>" +
+                         "<td>" + item.commitment + "</td>" +
+                         "<td>" + item.cooperation + "</td>" +
+                         "<td>" + item.initiative + "</td>" +
+                         "<td class='score-tag'>" + item.total.toFixed(2) + "</td>";
           recordsBody.appendChild(row);
         });
       }
@@ -383,13 +573,9 @@
         const grouped = new Map();
 
         state.evaluations.forEach((item) => {
-          const key = `${item.week}|${item.evaluatee}`;
+          const key = item.week + "|" + item.evaluatee;
           if (!grouped.has(key)) {
-            grouped.set(key, {
-              week: item.week,
-              evaluatee: item.evaluatee,
-              totals: []
-            });
+            grouped.set(key, { week: item.week, evaluatee: item.evaluatee, totals: [] });
           }
           grouped.get(key).totals.push(item.total);
         });
@@ -401,18 +587,13 @@
         rows.forEach((rowData) => {
           const peerCount = rowData.totals.length;
           const weeklyScore = average(rowData.totals).toFixed(2);
+          const isComplete = peerCount >= TARGET_PEER_COUNT;
           const row = document.createElement('tr');
-          [
-            rowData.week,
-            rowData.evaluatee,
-            `${peerCount}/${TARGET_PEER_COUNT}`,
-            weeklyScore,
-            peerCount === TARGET_PEER_COUNT ? 'Complete' : 'Pending'
-          ].forEach((value) => {
-            const cell = document.createElement('td');
-            cell.textContent = String(value);
-            row.appendChild(cell);
-          });
+          row.innerHTML = "<td>" + rowData.week + "</td>" +
+                         "<td><strong>" + rowData.evaluatee + "</strong></td>" +
+                         "<td>" + peerCount + "/" + TARGET_PEER_COUNT + "</td>" +
+                         "<td class='score-tag'>" + weeklyScore + "</td>" +
+                         "<td><span class='status-badge " + (isComplete ? 'status-complete' : 'status-pending') + "'>" + (isComplete ? 'Complete' : 'Pending') + "</span></td>";
           scoreboardBody.appendChild(row);
         });
       }
