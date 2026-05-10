@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.292.0/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
       :root {
         --primary: #3b82f6;
@@ -307,6 +308,17 @@
       
       .header-actions h2 { margin: 0; }
 
+      .sync-status {
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--text-muted);
+      }
+
+      .sync-online { color: var(--success); }
+      .sync-offline { color: #ef4444; }
+
       .card-stack {
         display: flex;
         flex-direction: column;
@@ -357,6 +369,9 @@
     <nav class="navbar">
       <i data-lucide="users"></i>
       <h1>Peer Eval</h1>
+      <div id="sync-indicator" class="sync-status" style="margin-left: auto;">
+        <i data-lucide="cloud-off"></i> Offline Mode (Local Only)
+      </div>
     </nav>
 
     <main>
@@ -668,7 +683,93 @@
 
       function saveState() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        broadcastState();
       }
+
+      // --- Peer-to-Peer Sync Logic ---
+      let peer = null;
+      let connections = [];
+      const syncIndicator = document.getElementById('sync-indicator');
+
+      function initSync() {
+        // Use a simple room-based ID or prompt for one
+        const roomId = new URLSearchParams(window.location.search).get('room');
+        
+        if (!roomId) {
+          syncIndicator.innerHTML = `<button class="btn-secondary" style="padding: 4px 8px; font-size: 0.7rem;" onclick="createRoom()"><i data-lucide="share-2" style="width:12px"></i> Enable Sync / Share</button>`;
+          lucide.createIcons();
+          return;
+        }
+
+        peer = new Peer(`peer-eval-${roomId}`);
+
+        peer.on('open', (id) => {
+          syncIndicator.innerHTML = `<i data-lucide="cloud" class="sync-online"></i> Syncing: ${roomId}`;
+          syncIndicator.classList.add('sync-online');
+          lucide.createIcons();
+        });
+
+        peer.on('connection', (conn) => {
+          setupConnection(conn);
+        });
+
+        // Try to connect to existing peers (simplified discovery)
+        // In a real app, you'd use a signaling server or central DB
+        // For this P2P proof-of-concept, we'll suggest using the same ID
+      }
+
+      window.createRoom = function() {
+        const name = prompt("Enter a unique Room Name for your team (e.g. 'rocket-team-2024'):");
+        if (name) {
+          window.location.search = `?room=${encodeURIComponent(name)}`;
+        }
+      }
+
+      function setupConnection(conn) {
+        connections.push(conn);
+        conn.on('data', (data) => {
+          if (data.type === 'SYNC_STATE') {
+            mergeState(data.state);
+          }
+        });
+        // Send our state to the newcomer
+        conn.send({ type: 'SYNC_STATE', state });
+      }
+
+      function broadcastState() {
+        connections.forEach(conn => {
+          if (conn.open) {
+            conn.send({ type: 'SYNC_STATE', state });
+          }
+        });
+      }
+
+      function mergeState(remoteState) {
+        let changed = false;
+        
+        // Merge users
+        remoteState.users.forEach(u => {
+          if (!state.users.includes(u)) {
+            state.users.push(u);
+            changed = true;
+          }
+        });
+
+        // Merge evaluations (by timestamp)
+        remoteState.evaluations.forEach(re => {
+          if (!state.evaluations.find(e => e.submittedAt === re.submittedAt)) {
+            state.evaluations.push(re);
+            changed = true;
+          }
+        });
+
+        if (changed) {
+          persistAndRender();
+        }
+      }
+
+      initSync();
+      // -------------------------------
 
       function setOptions(selectElement) {
         const currentValue = selectElement.value;
