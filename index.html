@@ -701,13 +701,18 @@
           return;
         }
 
-        peer = new Peer(`peer-eval-${roomId}`);
+        syncIndicator.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <i data-lucide="cloud" class="sync-online"></i> 
+            <span style="font-weight: 600;">${roomId}</span>
+            <button class="btn-secondary" style="padding: 2px 6px; font-size: 0.65rem; height: auto;" onclick="createRoom()">
+              <i data-lucide="edit-3" style="width:10px"></i> Change
+            </button>
+          </div>
+        `;
+        lucide.createIcons();
 
-        peer.on('open', (id) => {
-          syncIndicator.innerHTML = `<i data-lucide="cloud" class="sync-online"></i> Syncing: ${roomId}`;
-          syncIndicator.classList.add('sync-online');
-          lucide.createIcons();
-        });
+        peer = new Peer(`peer-eval-${roomId}`);
 
         peer.on('connection', (conn) => {
           setupConnection(conn);
